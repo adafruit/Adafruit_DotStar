@@ -110,7 +110,7 @@ void Adafruit_DotStar::hw_spi_init(void) { // Initialize hardware SPI
 #endif
 }
 
-void Adafruit_DotStar::hw_spi_end(void) { // Stop hardware SPI
+inline void Adafruit_DotStar::hw_spi_end(void) { // Stop hardware SPI
 #ifdef __AVR_ATtiny85__
   DDRB &= ~(_BV(PORTB1) | _BV(PORTB2)); // Inputs
 #else
@@ -256,7 +256,7 @@ void Adafruit_DotStar::show(void) {
   }
 }
 
-void Adafruit_DotStar::clear() { // Write 0s (off) to entire pixel buffer
+inline void Adafruit_DotStar::clear() { // Write 0s (off) to full pixel buffer
   memset(pixels, 0, numLEDs * 3);
 }
 
@@ -295,7 +295,7 @@ uint32_t Adafruit_DotStar::getPixelColor(uint16_t n) const {
         ((uint32_t)p[2] << 16);
 }
 
-uint16_t Adafruit_DotStar::numPixels(void) const { // Return strip length
+inline uint16_t Adafruit_DotStar::numPixels(void) const { // Ret. strip length
   return numLEDs;
 }
 
@@ -306,7 +306,7 @@ uint16_t Adafruit_DotStar::numPixels(void) const { // Return strip length
 // in this library is 'non destructive' -- it's applied as color data is
 // being issued to the strip, not during setPixel(), and also means that
 // getPixelColor() returns the exact value originally stored.
-void Adafruit_DotStar::setBrightness(uint8_t b) {
+inline void Adafruit_DotStar::setBrightness(uint8_t b) {
   // Stored brightness value is different than what's passed.  This
   // optimizes the actual scaling math later, allowing a fast 8x8-bit
   // multiply and taking the MSB.  'brightness' is a uint8_t, adding 1
@@ -316,13 +316,13 @@ void Adafruit_DotStar::setBrightness(uint8_t b) {
   brightness = b + 1;
 }
 
-uint8_t Adafruit_DotStar::getBrightness(void) const {
+inline uint8_t Adafruit_DotStar::getBrightness(void) const {
   return brightness - 1; // Reverse above operation
 }
 
 // Return pointer to the library's pixel data buffer.  Use carefully,
 // much opportunity for mayhem.  It's mostly for code that needs fast
 // transfers, e.g. SD card to LEDs.  Color data is in BGR order.
-uint8_t *Adafruit_DotStar::getPixels(void) const {
+inline uint8_t *Adafruit_DotStar::getPixels(void) const {
   return pixels;
 }
