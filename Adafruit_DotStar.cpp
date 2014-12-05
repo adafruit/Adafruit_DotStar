@@ -295,7 +295,7 @@ uint32_t Adafruit_DotStar::getPixelColor(uint16_t n) const {
         ((uint32_t)p[2] << 16);
 }
 
-inline uint16_t Adafruit_DotStar::numPixels(void) const { // Ret. strip length
+uint16_t Adafruit_DotStar::numPixels(void) { // Ret. strip length
   return numLEDs;
 }
 

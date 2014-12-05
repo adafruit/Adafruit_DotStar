@@ -13,8 +13,8 @@
 #define NUMPIXELS 30 // Number of LEDs in strip
 
 // Here's how to control the LEDs from any two pins:
-#define DATAPIN    2
-#define CLOCKPIN   3
+#define DATAPIN    4
+#define CLOCKPIN   5
 Adafruit_DotStar strip = Adafruit_DotStar(NUMPIXELS, DATAPIN, CLOCKPIN);
 
 // Hardware SPI is a little faster, but must be wired to specific pins

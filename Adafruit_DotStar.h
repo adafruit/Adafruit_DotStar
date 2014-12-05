@@ -46,7 +46,7 @@ class Adafruit_DotStar {
     Color(uint8_t r, uint8_t g, uint8_t b), // R,G,B to 32-bit color
     getPixelColor(uint16_t n) const;        // Return 32-bit pixel color
   uint16_t
-    numPixels(void) const;                  // Return number of pixels
+    numPixels(void);                  // Return number of pixels
   uint8_t
     getBrightness(void) const,              // Return global brightness
    *getPixels(void) const;                  // Return pixel data pointer
