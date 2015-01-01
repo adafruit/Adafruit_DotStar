@@ -32,15 +32,18 @@
 #define USE_HW_SPI 255 // Assign this to dataPin to indicate 'hard' SPI
 
 // Constructor for hardware SPI -- must connect to MOSI, SCK pins
-Adafruit_DotStar::Adafruit_DotStar(uint16_t n) :
- numLEDs(n), dataPin(USE_HW_SPI), brightness(0), pixels(NULL)
+Adafruit_DotStar::Adafruit_DotStar(uint16_t n, uint8_t o) :
+ numLEDs(n), dataPin(USE_HW_SPI), brightness(0), pixels(NULL),
+ rOffset(o & 3), gOffset((o >> 2) & 3), bOffset((o >> 4) & 3)
 {
   updateLength(n);
 }
 
 // Constructor for 'soft' (bitbang) SPI -- any two pins can be used
-Adafruit_DotStar::Adafruit_DotStar(uint16_t n, uint8_t data, uint8_t clock) :
- dataPin(data), clockPin(clock), brightness(0), pixels(NULL)
+Adafruit_DotStar::Adafruit_DotStar(uint16_t n, uint8_t data, uint8_t clock,
+  uint8_t o) :
+ dataPin(data), clockPin(clock), brightness(0), pixels(NULL),
+ rOffset(o & 3), gOffset((o >> 2) & 3), bOffset((o >> 4) & 3)
 {
   updateLength(n);
 }
@@ -265,9 +268,9 @@ void Adafruit_DotStar::setPixelColor(
  uint16_t n, uint8_t r, uint8_t g, uint8_t b) {
   if(n < numLEDs) {
     uint8_t *p = &pixels[n * 3];
-    *p++ = b; // Pixels actually expect
-    *p++ = g; // data in B,G,R order,
-    *p   = r; // but most code 'thinks' in R,G,B
+    p[rOffset] = r;
+    p[gOffset] = g;
+    p[bOffset] = b;
   }
 }
 
@@ -275,9 +278,9 @@ void Adafruit_DotStar::setPixelColor(
 void Adafruit_DotStar::setPixelColor(uint16_t n, uint32_t c) {
   if(n < numLEDs) {
     uint8_t *p = &pixels[n * 3];
-    *p++ = (uint8_t)c;         // B
-    *p++ = (uint8_t)(c >>  8); // G
-    *p   = (uint8_t)(c >> 16); // R
+    p[rOffset] = (uint8_t)(c >> 16);
+    p[gOffset] = (uint8_t)(c >>  8);
+    p[bOffset] = (uint8_t)c;
   }
 }
 
@@ -290,9 +293,9 @@ uint32_t Adafruit_DotStar::Color(uint8_t r, uint8_t g, uint8_t b) {
 uint32_t Adafruit_DotStar::getPixelColor(uint16_t n) const {
   if(n >= numLEDs) return 0;
   uint8_t *p = &pixels[n * 3];
-  return (uint32_t)p[0]        |
-        ((uint32_t)p[1] <<  8) |
-        ((uint32_t)p[2] << 16);
+  return ((uint32_t)p[rOffset] << 16) |
+         ((uint32_t)p[gOffset] <<  8) |
+          (uint32_t)p[bOffset];
 }
 
 uint16_t Adafruit_DotStar::numPixels(void) { // Ret. strip length
