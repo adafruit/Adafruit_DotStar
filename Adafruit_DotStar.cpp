@@ -265,8 +265,8 @@ void Adafruit_DotStar::setPixelColor(
  uint16_t n, uint8_t r, uint8_t g, uint8_t b) {
   if(n < numLEDs) {
     uint8_t *p = &pixels[n * 3];
-    *p++ = b; // Pixels actually expect
-    *p++ = g; // data in B,G,R order,
+    *p++ = g; // Pixels actually expect
+    *p++ = b; // data in G,B,R order,
     *p   = r; // but most code 'thinks' in R,G,B
   }
 }
@@ -275,8 +275,8 @@ void Adafruit_DotStar::setPixelColor(
 void Adafruit_DotStar::setPixelColor(uint16_t n, uint32_t c) {
   if(n < numLEDs) {
     uint8_t *p = &pixels[n * 3];
-    *p++ = (uint8_t)c;         // B
     *p++ = (uint8_t)(c >>  8); // G
+    *p++ = (uint8_t)c;         // B
     *p   = (uint8_t)(c >> 16); // R
   }
 }
@@ -290,8 +290,8 @@ uint32_t Adafruit_DotStar::Color(uint8_t r, uint8_t g, uint8_t b) {
 uint32_t Adafruit_DotStar::getPixelColor(uint16_t n) const {
   if(n >= numLEDs) return 0;
   uint8_t *p = &pixels[n * 3];
-  return (uint32_t)p[0]        |
-        ((uint32_t)p[1] <<  8) |
+  return (uint32_t)p[1]        |
+        ((uint32_t)p[0] <<  8) |
         ((uint32_t)p[2] << 16);
 }
 
