@@ -33,13 +33,14 @@
 #define DOTSTAR_GBR (2 | (0 << 2) | (1 << 4))
 #define DOTSTAR_BRG (1 | (2 << 2) | (0 << 4))
 #define DOTSTAR_BGR (2 | (1 << 2) | (0 << 4))
+#define DOTSTAR_MONO 0 // Single-color strip WIP DO NOT USE YET
 
 class Adafruit_DotStar {
 
  public:
 
-    Adafruit_DotStar(uint16_t n, uint8_t o=DOTSTAR_GBR);
-    Adafruit_DotStar(uint16_t n, uint8_t d, uint8_t c, uint8_t o=DOTSTAR_GBR);
+    Adafruit_DotStar(uint16_t n, uint8_t o=DOTSTAR_BRG);
+    Adafruit_DotStar(uint16_t n, uint8_t d, uint8_t c, uint8_t o=DOTSTAR_BRG);
    ~Adafruit_DotStar(void);
   void
     begin(void),                            // Prime pins/SPI for output
@@ -55,7 +56,7 @@ class Adafruit_DotStar {
     Color(uint8_t r, uint8_t g, uint8_t b), // R,G,B to 32-bit color
     getPixelColor(uint16_t n) const;        // Return 32-bit pixel color
   uint16_t
-    numPixels(void);                  // Return number of pixels
+    numPixels(void);                        // Return number of pixels
   uint8_t
     getBrightness(void) const,              // Return global brightness
    *getPixels(void) const;                  // Return pixel data pointer

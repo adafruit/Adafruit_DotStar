@@ -86,7 +86,9 @@ void Adafruit_DotStar::updatePins(uint8_t data, uint8_t clock) {
 // Instead, set length once to longest strip.
 void Adafruit_DotStar::updateLength(uint16_t n) {
   if(pixels) free(pixels);
-  uint16_t bytes = n * 3;
+  uint16_t bytes = (rOffset == gOffset) ?
+    n + ((n + 3) / 4) : // MONO: 10 bits/pixel, round up to next byte
+    n * 3;              // COLOR: 3 bytes/pixel
   if((pixels = (uint8_t *)malloc(bytes))) {
     numLEDs = n;
     clear();
@@ -260,7 +262,9 @@ void Adafruit_DotStar::show(void) {
 }
 
 void Adafruit_DotStar::clear() { // Write 0s (off) to full pixel buffer
-  memset(pixels, 0, numLEDs * 3);
+  memset(pixels, 0, (rOffset == gOffset) ?
+    numLEDs + ((numLEDs + 3) / 4) : // MONO: 10 bits/pixel
+    numLEDs * 3);                   // COLOR: 3 bytes/pixel
 }
 
 // Set pixel color, separate R,G,B values (0-255 ea.)
