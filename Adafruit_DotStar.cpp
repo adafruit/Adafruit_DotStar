@@ -48,7 +48,7 @@ Adafruit_DotStar::Adafruit_DotStar(uint16_t n, uint8_t data, uint8_t clock,
   updateLength(n);
 }
 
-Adafruit_DotStar::Adafruit_DotStar(void);
+Adafruit_DotStar::Adafruit_DotStar(void) {};
 
 Adafruit_DotStar::~Adafruit_DotStar(void) { // Destructor
   if(pixels)                free(pixels);
