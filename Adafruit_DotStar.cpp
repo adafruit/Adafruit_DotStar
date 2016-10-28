@@ -244,8 +244,11 @@ void Adafruit_DotStar::show(void) {
     // pixel, and empirical testing suggests it can be left out...but it's
     // always a good idea to follow the datasheet, in case future hardware
     // revisions are more strict (e.g. might mandate use of end-frame
-    // before start-frame marker).  i.e. let's not remove this.
-    for(i=0; i<4; i++) spi_out(0xFF);
+    // before start-frame marker).  i.e. let's not remove this. But after
+    // testing a bit more the suggestion is to use at least (numLeds+1)/2
+    // high values (1) or (numLeds+15)/16 full bytes as EndFrame. For details see also:
+    // https://cpldcpu.wordpress.com/2014/11/30/understanding-the-apa102-superled/
+    for(i=0; i<((numLEDs + 15) / 16); i++) spi_out(0xFF);
 
   } else {                               // Soft (bitbang) SPI
 
@@ -261,7 +264,7 @@ void Adafruit_DotStar::show(void) {
         for(i=0; i<3; i++) sw_spi_out(*ptr++); // R,G,B
       } while(--n);
     }
-    for(i=0; i<4; i++) sw_spi_out(0xFF); // End-frame marker (see note above)
+    for(i=0; i<((numLEDs + 15) / 16); i++) sw_spi_out(0xFF); // End-frame marker (see note above)
   }
 }
 
