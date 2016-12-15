@@ -29,8 +29,6 @@
  #include <SPI.h>
 #endif
 
-#define USE_HW_SPI 255 // Assign this to dataPin to indicate 'hard' SPI
-
 // Constructor for hardware SPI -- must connect to MOSI, SCK pins
 Adafruit_DotStar::Adafruit_DotStar(uint16_t n, uint8_t o) :
  numLEDs(n), dataPin(USE_HW_SPI), brightness(0), pixels(NULL),
