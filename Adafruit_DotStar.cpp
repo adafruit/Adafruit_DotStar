@@ -103,7 +103,7 @@ void Adafruit_DotStar::hw_spi_init(void) { // Initialize hardware SPI
 #ifdef __AVR_ATtiny85__
   PORTB &= ~(_BV(PORTB1) | _BV(PORTB2)); // Outputs
   DDRB  |=   _BV(PORTB1) | _BV(PORTB2);  // DO (NOT MOSI) + SCK
-#else
+#elif defined(SPI)
   SPI.begin();
  #if defined(__AVR__) || defined(CORE_TEENSY) || defined(__ARDUINO_ARC__) || defined(__ARDUINO_X86__)
   SPI.setClockDivider(SPI_CLOCK_DIV2); // 8 MHz (6 MHz on Pro Trinket 3V)
@@ -122,7 +122,7 @@ void Adafruit_DotStar::hw_spi_init(void) { // Initialize hardware SPI
 void Adafruit_DotStar::hw_spi_end(void) { // Stop hardware SPI
 #ifdef __AVR_ATtiny85__
   DDRB &= ~(_BV(PORTB1) | _BV(PORTB2)); // Inputs
-#else
+#elif defined(SPI)
   SPI.end();
 #endif
 }
@@ -161,7 +161,7 @@ static void spi_out(uint8_t n) { // Clock out one byte
   SPIBIT SPIBIT SPIBIT SPIBIT SPIBIT SPIBIT SPIBIT SPIBIT
 }
 
-#else
+#elif defined(SPI)
 
 // All other boards have full-featured hardware support for SPI
 
@@ -170,6 +170,9 @@ static void spi_out(uint8_t n) { // Clock out one byte
 #if (defined(__AVR__) && !defined(__AVR_ATtiny85__)) || defined(CORE_TEENSY)
  #define SPI_PIPELINE
 #endif
+
+#else // no hardware spi
+#define spi_out(n) sw_spi_out(n)
 
 #endif
 
