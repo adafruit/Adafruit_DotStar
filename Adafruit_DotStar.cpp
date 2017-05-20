@@ -25,7 +25,11 @@
   ------------------------------------------------------------------------*/
 
 #include "Adafruit_DotStar.h"
-#if !defined(__AVR_ATtiny85__)
+#if NRF52
+  // e.g. RedBear Nano v2
+  #include <SPI_Master.h>
+  #define SPI SPI_Master
+#elif !defined(__AVR_ATtiny85__)
  #include <SPI.h>
 #endif
 
@@ -110,12 +114,23 @@ void Adafruit_DotStar::hw_spi_init(void) { // Initialize hardware SPI
  #else
   #ifdef ESP8266
     SPI.setFrequency(8000000L);
+  #elif NRF52
+    // e.g. RedBear Nano v2
+    SPI.setFrequency(SPI_8M); // TODO: is this the right MHz?
   #else
     SPI.setClockDivider((F_CPU + 4000000L) / 8000000L); // 8-ish MHz on Due
   #endif
  #endif
-  SPI.setBitOrder(MSBFIRST);
-  SPI.setDataMode(SPI_MODE0);
+ #ifdef NRF52
+  // e.g. RedBear Nano v2
+  SPI.setBitORDER(MSBFIRST);
+  SPI.setSPIMode(SPI_MODE0);
+ #else
+
+ SPI.setBitOrder(MSBFIRST);
+ SPI.setDataMode(SPI_MODE0);
+ #endif
+  
 #endif
 }
 
