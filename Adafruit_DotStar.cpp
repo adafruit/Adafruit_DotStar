@@ -110,6 +110,10 @@ void Adafruit_DotStar::hw_spi_init(void) { // Initialize hardware SPI
  #else
   #ifdef ESP8266
     SPI.setFrequency(8000000L);
+  #elif defined(PIC32)
+    // Use begin/end transaction to set SPI clock rate
+    SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
+    SPI.endTransaction();
   #else
     SPI.setClockDivider((F_CPU + 4000000L) / 8000000L); // 8-ish MHz on Due
   #endif
