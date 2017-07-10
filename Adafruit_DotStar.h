@@ -35,6 +35,8 @@
 #define DOTSTAR_BGR (2 | (1 << 2) | (0 << 4))
 #define DOTSTAR_MONO 0 // Single-color strip WIP DO NOT USE YET
 
+#define USE_HW_SPI 255 // Assign this to dataPin to indicate 'hard' SPI
+
 class Adafruit_DotStar {
 
  public:
