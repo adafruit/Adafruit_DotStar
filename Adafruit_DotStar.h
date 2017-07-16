@@ -24,6 +24,9 @@
  #include <WProgram.h>
  #include <pins_arduino.h>
 #endif
+#if !defined(__AVR_ATtiny85__)
+ #include <SPI.h>
+#endif
 
 // Color-order flag for LED pixels (optional extra parameter to constructor):
 // Bits 0,1 = R index (0-2), bits 2,3 = G index, bits 4,5 = B index
@@ -39,7 +42,10 @@ class Adafruit_DotStar {
 
  public:
 
+#if (SPI_INTERFACES_COUNT > 0) || !defined(SPI_INTERFACES_COUNT)
     Adafruit_DotStar(uint16_t n, uint8_t o=DOTSTAR_BRG);
+#endif
+    Adafruit_DotStar(uint16_t n, SPIClass* spi, uint8_t o=DOTSTAR_BRG);
     Adafruit_DotStar(uint16_t n, uint8_t d, uint8_t c, uint8_t o=DOTSTAR_BRG);
    ~Adafruit_DotStar(void);
   void
@@ -73,6 +79,8 @@ class Adafruit_DotStar {
     rOffset,                                // Index of red in 3-byte pixel
     gOffset,                                // Index of green byte
     bOffset;                                // Index of blue byte
+  SPIClass*
+    hwSPI;
 #ifdef __AVR__
   uint8_t
     dataPinMask,                            // If soft SPI, data pin bitmask
