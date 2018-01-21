@@ -59,7 +59,9 @@ class Adafruit_DotStar {
     numPixels(void);                        // Return number of pixels
   uint8_t
     getBrightness(void) const,              // Return global brightness
-   *getPixels(void) const;                  // Return pixel data pointer
+   *getPixels(void) const,                  // Return pixel data pointer
+    sine8(uint8_t) const,
+    gamma8(uint8_t) const;
 
  private:
 
