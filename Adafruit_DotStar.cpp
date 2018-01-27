@@ -348,6 +348,9 @@ uint8_t *Adafruit_DotStar::getPixels(void) const {
   return pixels;
 }
 
+#ifndef M_PI
+#define M_PI 3.1415927
+#endif
 // This bizarre construct isn't Arduino code in the conventional sense.
 // It exploits features of GCC's preprocessor to generate a PROGMEM
 // table (in flash memory) holding an 8-bit unsigned sine wave (0-255).
