@@ -46,6 +46,7 @@ class Adafruit_DotStar {
     begin(void),                            // Prime pins/SPI for output
     clear(),                                // Set all pixel data to zero
     setBrightness(uint8_t),                 // Set global brightness 0-255
+    useOnboardBrightness(bool),                  // set use_onboard_brightness flag
     setPixelColor(uint16_t n, uint32_t c),
     setPixelColor(uint16_t n, uint8_t r, uint8_t g, uint8_t b),
     show(void),                             // Issue color data to strip
@@ -71,6 +72,7 @@ class Adafruit_DotStar {
     dataPin,                                // If soft SPI, data pin #
     clockPin,                               // If soft SPI, clock pin #
     brightness,                             // Global brightness setting
+    use_onboard_brightness,                 // Use onboard brightness instead of software scaling
    *pixels,                                 // LED RGB values (3 bytes ea.)
     rOffset,                                // Index of red in 3-byte pixel
     gOffset,                                // Index of green byte

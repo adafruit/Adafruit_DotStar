@@ -33,8 +33,8 @@
 
 // Constructor for hardware SPI -- must connect to MOSI, SCK pins
 Adafruit_DotStar::Adafruit_DotStar(uint16_t n, uint8_t o) :
- numLEDs(n), dataPin(USE_HW_SPI), brightness(0), pixels(NULL),
- rOffset(o & 3), gOffset((o >> 2) & 3), bOffset((o >> 4) & 3)
+ numLEDs(n), dataPin(USE_HW_SPI), brightness(0), use_onboard_brightness(false),
+ pixels(NULL), rOffset(o & 3), gOffset((o >> 2) & 3), bOffset((o >> 4) & 3)
 {
   updateLength(n);
 }
@@ -42,8 +42,8 @@ Adafruit_DotStar::Adafruit_DotStar(uint16_t n, uint8_t o) :
 // Constructor for 'soft' (bitbang) SPI -- any two pins can be used
 Adafruit_DotStar::Adafruit_DotStar(uint16_t n, uint8_t data, uint8_t clock,
   uint8_t o) :
- dataPin(data), clockPin(clock), brightness(0), pixels(NULL),
- rOffset(o & 3), gOffset((o >> 2) & 3), bOffset((o >> 4) & 3)
+ dataPin(data), clockPin(clock), brightness(0), use_onboard_brightness(false),
+ pixels(NULL), rOffset(o & 3), gOffset((o >> 2) & 3), bOffset((o >> 4) & 3)
 {
   updateLength(n);
 }
@@ -216,6 +216,9 @@ void Adafruit_DotStar::show(void) {
   uint8_t *ptr = pixels, i;            // -> LED data
   uint16_t n   = numLEDs;              // Counter
   uint16_t b16 = (uint16_t)brightness; // Type-convert for fixed-point math
+  // onboard brightness is 5-bit only, so bitshift and add to 0xE0
+  // subtract 1 first since 0 = max brightness
+  uint8_t b_header = use_onboard_brightness ? 0xE0 + ((brightness - 1) >> 3) : 0xFF;
 
   if(dataPin == USE_HW_SPI) {
 
@@ -225,9 +228,9 @@ void Adafruit_DotStar::show(void) {
     SPDR = 0x00;                         // 4th is pipelined
     do {                                 // For each pixel...
       while(!(SPSR & _BV(SPIF)));        //  Wait for prior byte out
-      SPDR = 0xFF;                       //  Pixel start
+      SPDR = b_header;                   //  Pixel start
       for(i=0; i<3; i++) {               //  For R,G,B...
-        next = brightness ? (*ptr++ * b16) >> 8 : *ptr++; // Read, scale
+        next = (!use_onboard_brightness && brightness) ? (*ptr++ * b16) >> 8 : *ptr++; // Read, scale
         while(!(SPSR & _BV(SPIF)));      //   Wait for prior byte out
         SPDR = next;                     //   Write scaled color
       }
@@ -235,43 +238,41 @@ void Adafruit_DotStar::show(void) {
     while(!(SPSR & _BV(SPIF)));          // Wait for last byte out
 #else
     for(i=0; i<4; i++) spi_out(0x00);    // 4 byte start-frame marker
-    if(brightness) {                     // Scale pixel brightness on output
+    if(!use_onboard_brightness && brightness) {                     // Scale pixel brightness on output
       do {                               // For each pixel...
-        spi_out(0xFF);                   //  Pixel start
+        spi_out(b_header);                   //  Pixel start
         for(i=0; i<3; i++) spi_out((*ptr++ * b16) >> 8); // Scale, write RGB
       } while(--n);
     } else {                             // Full brightness (no scaling)
       do {                               // For each pixel...
-        spi_out(0xFF);                   //  Pixel start
+        spi_out(b_header);                   //  Pixel start
         for(i=0; i<3; i++) spi_out(*ptr++); // Write R,G,B
       } while(--n);
     }
 #endif
-    // Four end-frame bytes are seemingly indistinguishable from a white
-    // pixel, and empirical testing suggests it can be left out...but it's
-    // always a good idea to follow the datasheet, in case future hardware
-    // revisions are more strict (e.g. might mandate use of end-frame
-    // before start-frame marker).  i.e. let's not remove this. But after
-    // testing a bit more the suggestion is to use at least (numLeds+1)/2
-    // high values (1) or (numLeds+15)/16 full bytes as EndFrame. For details see also:
-    // https://cpldcpu.wordpress.com/2014/11/30/understanding-the-apa102-superled/
-    for(i=0; i<((numLEDs + 15) / 16); i++) spi_out(0xFF);
+    // APA102 and SK9822 require and end frame of at least (numLeds+1)/2
+    // high values (1) or (numLeds+15)/16 full bytes. For the APA102 these can either
+    // be all 1s or all 0s. But for the SK9822, all 0s works best.
+    // However, SK9822 technically requires an aditional 32 zero-bits
+    // appended to the end-frame to function correctly on long runs. Hence the +4
+    // More info here: https://cpldcpu.wordpress.com/2016/12/13/sk9822-a-clone-of-the-apa102/
+    for(i=0; i<((numLEDs + 15) / 16) + 4; i++) spi_out(0x0);
 
   } else {                               // Soft (bitbang) SPI
 
     for(i=0; i<4; i++) sw_spi_out(0);    // Start-frame marker
     if(brightness) {                     // Scale pixel brightness on output
       do {                               // For each pixel...
-        sw_spi_out(0xFF);                //  Pixel start
+        sw_spi_out(b_header);                //  Pixel start
         for(i=0; i<3; i++) sw_spi_out((*ptr++ * b16) >> 8); // Scale, write
       } while(--n);
     } else {                             // Full brightness (no scaling)
       do {                               // For each pixel...
-        sw_spi_out(0xFF);                //  Pixel start
+        sw_spi_out(b_header);                //  Pixel start
         for(i=0; i<3; i++) sw_spi_out(*ptr++); // R,G,B
       } while(--n);
     }
-    for(i=0; i<((numLEDs + 15) / 16); i++) sw_spi_out(0xFF); // End-frame marker (see note above)
+    for(i=0; i<((numLEDs + 15) / 16) + 4; i++) sw_spi_out(0x0); // End-frame marker (see note above)
   }
 }
 
@@ -339,6 +340,22 @@ void Adafruit_DotStar::setBrightness(uint8_t b) {
 
 uint8_t Adafruit_DotStar::getBrightness(void) const {
   return brightness - 1; // Reverse above operation
+}
+
+/*
+  Although the LED driver has an additional per-pixel 5-bit brightness
+  setting, it should not be used for the APA102 because it's a brain-dead
+  misfeature that's counter to the whole point of Dot Stars, which is to
+  have a much faster PWM rate than NeoPixels.  It gates the high-speed
+  PWM output through a second, much slower PWM (about 400 Hz), rendering
+  it useless for POV. For the SK9822 variant, however, this brightness
+  control is achieved through a constant current control. So, although
+  the SK9822 uses a lower 4.7kHz PWM rate while APA102 uses ~19kHz,
+  the SK9822 can still be used for POV while using onboard
+  brightness control.
+*/
+void Adafruit_DotStar::useOnboardBrightness(bool val) {
+  use_onboard_brightness = val;
 }
 
 // Return pointer to the library's pixel data buffer.  Use carefully,
