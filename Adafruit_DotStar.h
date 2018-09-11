@@ -52,8 +52,9 @@ class Adafruit_DotStar {
     updatePins(void),                       // Change pin assignments (HW)
     updatePins(uint8_t d, uint8_t c),       // Change pin assignments (SW)
     updateLength(uint16_t n);               // Change length
+  static uint32_t
+    Color(uint8_t r, uint8_t g, uint8_t b); // R,G,B to 32-bit color
   uint32_t
-    Color(uint8_t r, uint8_t g, uint8_t b), // R,G,B to 32-bit color
     getPixelColor(uint16_t n) const;        // Return 32-bit pixel color
   uint16_t
     numPixels(void);                        // Return number of pixels
