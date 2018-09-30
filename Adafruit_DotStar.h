@@ -48,6 +48,8 @@ class Adafruit_DotStar {
     setBrightness(uint8_t),                 // Set global brightness 0-255
     setPixelColor(uint16_t n, uint32_t c),
     setPixelColor(uint16_t n, uint8_t r, uint8_t g, uint8_t b),
+    shift(uint32_t c),                      // Shift all pixels and set pixel 0
+    shift(uint8_t r, uint8_t g, uint8_t b),
     show(void),                             // Issue color data to strip
     updatePins(void),                       // Change pin assignments (HW)
     updatePins(uint8_t d, uint8_t c),       // Change pin assignments (SW)
@@ -84,6 +86,7 @@ class Adafruit_DotStar {
    *clockPort;                              // If soft SPI, clock PORT
 #endif
   void
+    shift(),                                // Shift all pixels one spot
     hw_spi_init(void),                      // Start hardware SPI
     hw_spi_end(void),                       // Stop hardware SPI
     sw_spi_init(void),                      // Start bitbang SPI
