@@ -302,6 +302,22 @@ void Adafruit_DotStar::setPixelColor(uint16_t n, uint32_t c) {
   }
 }
 
+void Adafruit_DotStar::shift() {
+  memmove(&pixels[3], &pixels[0], 3 * (numLEDs - 1) * sizeof(uint8_t));
+}
+
+// Shift all pixels, then set pixel 0 color, separate R,G,B values (0-255 ea.)
+void Adafruit_DotStar::shift(uint8_t r, uint8_t g, uint8_t b) {
+  shift();
+  setPixelColor(0, r, g, b);
+}
+
+// Shift all pixels, then set pixel 0 color, 'packed' RGB value (0x000000 - 0xFFFFFF)
+void Adafruit_DotStar::shift(uint32_t c) {
+  shift();
+  setPixelColor(0, c);
+}
+
 // Convert separate R,G,B to packed value
 uint32_t Adafruit_DotStar::Color(uint8_t r, uint8_t g, uint8_t b) {
   return ((uint32_t)r << 16) | ((uint32_t)g << 8) | b;
