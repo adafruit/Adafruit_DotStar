@@ -41,6 +41,7 @@ class Adafruit_DotStar {
 
     Adafruit_DotStar(uint16_t n, uint8_t o=DOTSTAR_BRG);
     Adafruit_DotStar(uint16_t n, uint8_t d, uint8_t c, uint8_t o=DOTSTAR_BRG);
+    Adafruit_DotStar(void);
    ~Adafruit_DotStar(void);
   void
     begin(void),                            // Prime pins/SPI for output
