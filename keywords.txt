@@ -1,0 +1,42 @@
+#######################################
+# Syntax Coloring Map For Adafruit_DotStar
+#######################################
+# Class
+#######################################
+
+Adafruit_DotStar	KEYWORD1
+
+#######################################
+# Methods and Functions
+#######################################	
+
+begin			KEYWORD2
+show			KEYWORD2
+setPixelColor		KEYWORD2
+fill			KEYWORD2
+setBrightness		KEYWORD2
+clear			KEYWORD2
+updateLength		KEYWORD2
+updatePins		KEYWORD2
+getPixels		KEYWORD2
+getBrightness		KEYWORD2
+numPixels		KEYWORD2
+getPixelColor		KEYWORD2
+sine8			KEYWORD2
+gamma8			KEYWORD2
+Color			KEYWORD2
+ColorHSV		KEYWORD2
+gamma32			KEYWORD2
+
+#######################################
+# Constants
+#######################################
+
+DOTSTAR_RGB		LITERAL1
+DOTSTAR_RBG		LITERAL1
+DOTSTAR_GRB		LITERAL1
+DOTSTAR_GBR		LITERAL1
+DOTSTAR_BRG		LITERAL1
+DOTSTAR_BGR		LITERAL1
+DOTSTAR_MONO		LITERAL1
+

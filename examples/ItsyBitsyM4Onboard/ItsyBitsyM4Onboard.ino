@@ -11,10 +11,7 @@
 #define DATAPIN    8
 #define CLOCKPIN   6
 
-//PB2 and PB3 on Itsy
-//
-Adafruit_DotStar px = Adafruit_DotStar(
-  NUMPIXELS, DATAPIN, CLOCKPIN, DOTSTAR_BRG);
+Adafruit_DotStar px(NUMPIXELS, DATAPIN, CLOCKPIN, DOTSTAR_BRG);
 
 void setup() {
   px.begin(); // Initialize pins for output
@@ -25,10 +22,10 @@ void setup() {
 uint16_t red = 0, green = 0, blue = 0;
 
 void loop() {
-  px.setPixelColor(0, red, green, blue); //set the pixel colors
-  px.show();                     // Refresh strip
-  delay(20);                     // Pause 20 milliseconds (~50 FPS)
-  red += random(-8,8); //add random numbers to each pixel value
-  green += random(-8,8);
-  blue += random(-8,8);
+  px.setPixelColor(0, red, green, blue); // Set the pixel colors
+  px.show();              // Refresh strip
+  delay(20);              // Pause 20 milliseconds (~50 FPS)
+  red   += random(-8, 8); // add random numbers to each pixel value
+  green += random(-8, 8);
+  blue  += random(-8, 8);
 }
