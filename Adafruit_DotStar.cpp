@@ -167,6 +167,10 @@ void Adafruit_DotStar::hw_spi_init(void) { // Initialize hardware SPI
   DDRB  |=   _BV(PORTB1) | _BV(PORTB2);  // DO (NOT MOSI) + SCK
 #elif (SPI_INTERFACES_COUNT > 0) || !defined(SPI_INTERFACES_COUNT)
   SPI.begin();
+  // Hardware SPI clock speeds are chosen to run at roughly 1-8 MHz for most
+  // boards, providing a slower but more reliable experience by default.  If
+  // you want faster LED updates, experiment with the clock speeds to find
+  // what works best with your particular setup.
  #if defined(__AVR__) || defined(CORE_TEENSY) || defined(__ARDUINO_ARC__) || defined(__ARDUINO_X86__)
   SPI.setClockDivider(SPI_CLOCK_DIV2); // 8 MHz (6 MHz on Pro Trinket 3V)
  #else
