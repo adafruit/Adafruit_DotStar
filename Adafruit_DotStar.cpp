@@ -271,7 +271,17 @@ void Adafruit_DotStar::sw_spi_out(uint8_t n) {
     if(n & 0x80) digitalWrite(dataPin, HIGH);
     else         digitalWrite(dataPin, LOW);
     digitalWrite(clockPin, HIGH);
+#if F_CPU >= 48000000
+    __asm__ volatile(
+    "nop \n nop"
+    );
+#endif
     digitalWrite(clockPin, LOW);
+#if F_CPU >= 48000000
+    __asm__ volatile(
+    "nop \n nop"
+    );
+#endif
 #endif
   }
 }
