@@ -244,28 +244,16 @@ void Adafruit_DotStar::sw_spi_init(void) {
 #endif
 }
 
-/*!
-  @brief   Stop 'soft' (bitbang) SPI. Data and clock pins are set to inputs.
-*/
-void Adafruit_DotStar::sw_spi_end(void) {
-	pinMode(dataPin, INPUT);
-	// agrees with pinMap but can't be assumed (Portenta H7 comment).
-	pinMode(clockPin, INPUT);
-	// agrees with pinMap but can't be assumed (Portenta H7 comment).
-}
-
 #if defined(__AVR_ATtiny85__)
-
 // Teensy/Gemma-specific stuff for hardware-half-assisted SPI
-
-#define SPIBIT                                                                 \
-  USICR = ((1 << USIWM0) | (1 << USITC));                                      \
-  USICR =                                                                      \
-      ((1 << USIWM0) | (1 << USITC) | (1 << USICLK)); // Clock bit tick, tock
+#define SPIBIT  \
+    USICR = ((1 << USIWM0) | (1 << USITC)); \
+    USICR =  \
+	((1 << USIWM0) | (1 << USITC) | (1 << USICLK)); // Clock bit tick, tock
 
 static void spi_out(uint8_t n) { // Clock out one byte
-  USIDR = n;
-  SPIBIT SPIBIT SPIBIT SPIBIT SPIBIT SPIBIT SPIBIT SPIBIT
+	USIDR = n;
+	SPIBIT SPIBIT SPIBIT SPIBIT SPIBIT SPIBIT SPIBIT SPIBIT
 }
 
 #elif (SPI_INTERFACES_COUNT > 0) || !defined(SPI_INTERFACES_COUNT)
@@ -282,6 +270,17 @@ static void spi_out(uint8_t n) { // Clock out one byte
 #define spi_out(n) sw_spi_out(n)
 
 #endif
+
+
+/*!
+  @brief   Stop 'soft' (bitbang) SPI. Data and clock pins are set to inputs.
+*/
+void Adafruit_DotStar::sw_spi_end(void) {
+	pinMode(dataPin, INPUT);
+	// agrees with pinMap but can't be assumed (Portenta H7 comment).
+	pinMode(clockPin, INPUT);
+	// agrees with pinMap but can't be assumed (Portenta H7 comment).
+}
 
 /*!
   @brief   Soft (bitbang) SPI write.
@@ -657,3 +656,5 @@ uint32_t Adafruit_DotStar::gamma32(uint32_t x) {
     y[i] = gamma8(y[i]);
   return x; // Packed 32-bit return
 }
+
+
