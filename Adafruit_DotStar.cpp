@@ -272,15 +272,6 @@ static void spi_out(uint8_t n) { // Clock out one byte
 #endif
 
 
-/*!
-  @brief   Stop 'soft' (bitbang) SPI. Data and clock pins are set to inputs.
-*/
-void Adafruit_DotStar::sw_spi_end(void) {
-	pinMode(dataPin, INPUT);
-	// agrees with pinMap but can't be assumed (Portenta H7 comment).
-	pinMode(clockPin, INPUT);
-	// agrees with pinMap but can't be assumed (Portenta H7 comment).
-}
 
 /*!
   @brief   Soft (bitbang) SPI write.
@@ -655,6 +646,16 @@ uint32_t Adafruit_DotStar::gamma32(uint32_t x) {
   for (uint8_t i = 0; i < 4; i++)
     y[i] = gamma8(y[i]);
   return x; // Packed 32-bit return
+}
+
+/*!
+  @brief   Stop 'soft' (bitbang) SPI. Data and clock pins are set to inputs.
+*/
+void Adafruit_DotStar::sw_spi_end(void) {
+	pinMode(dataPin, INPUT);
+	// agrees with pinMap but can't be assumed (Portenta H7 comment).
+	pinMode(clockPin, INPUT);
+	// agrees with pinMap but can't be assumed (Portenta H7 comment).
 }
 
 
