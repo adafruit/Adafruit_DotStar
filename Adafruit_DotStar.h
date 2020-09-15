@@ -18,7 +18,7 @@
  *
  */
 
-#ifndef _ADAFRUIT_DOT_STAR_H_
+#if !defined(_ADAFRUIT_DOT_STAR_H_)
 #define _ADAFRUIT_DOT_STAR_H_
 
 #if (ARDUINO >= 100)
@@ -198,7 +198,7 @@ private:
   uint8_t rOffset;    ///< Index of red in 3-byte pixel
   uint8_t gOffset;    ///< Index of green byte
   uint8_t bOffset;    ///< Index of blue byte
-#ifdef __AVR__
+#if defined(__AVR__)
   uint8_t dataPinMask;         ///< If soft SPI, data pin bitmask
   uint8_t clockPinMask;        ///< If soft SPI, clock pin bitmask
   volatile uint8_t *dataPort;  ///< If soft SPI, data PORT

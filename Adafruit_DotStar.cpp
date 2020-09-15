@@ -181,7 +181,7 @@ void Adafruit_DotStar::updateLength(uint16_t n) {
            some rewriting to correctly share the SPI bus with other devices.
 */
 void Adafruit_DotStar::hw_spi_init(void) { // Initialize hardware SPI
-#if defined (__AVR_ATtiny85__)
+#if defined(__AVR_ATtiny85__)
   PORTB &= ~(_BV(PORTB1) | _BV(PORTB2)); // Outputs
   DDRB |= _BV(PORTB1) | _BV(PORTB2);     // DO (NOT MOSI) + SCK
 #elif (SPI_INTERFACES_COUNT > 0) || !defined(SPI_INTERFACES_COUNT)
@@ -248,8 +248,10 @@ void Adafruit_DotStar::sw_spi_init(void) {
   @brief   Stop 'soft' (bitbang) SPI. Data and clock pins are set to inputs.
 */
 void Adafruit_DotStar::sw_spi_end() {
-  pinMode(dataPin, INPUT);              // agrees with pinMap but can't be assumed (Portenta H7 comment).
-  pinMode(clockPin, INPUT);             // agrees with pinMap but can't be assumed (Portenta H7 comment).
+	pinMode(dataPin, INPUT);
+	// agrees with pinMap but can't be assumed (Portenta H7 comment).
+	pinMode(clockPin, INPUT);
+	// agrees with pinMap but can't be assumed (Portenta H7 comment).
 }
 
 #if defined(__AVR_ATtiny85__)
