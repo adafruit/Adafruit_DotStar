@@ -181,7 +181,7 @@ void Adafruit_DotStar::updateLength(uint16_t n) {
            some rewriting to correctly share the SPI bus with other devices.
 */
 void Adafruit_DotStar::hw_spi_init(void) { // Initialize hardware SPI
-#ifdef __AVR_ATtiny85__
+#if defined (__AVR_ATtiny85__)
   PORTB &= ~(_BV(PORTB1) | _BV(PORTB2)); // Outputs
   DDRB |= _BV(PORTB1) | _BV(PORTB2);     // DO (NOT MOSI) + SCK
 #elif (SPI_INTERFACES_COUNT > 0) || !defined(SPI_INTERFACES_COUNT)
@@ -194,7 +194,7 @@ void Adafruit_DotStar::hw_spi_init(void) { // Initialize hardware SPI
     defined(__ARDUINO_X86__)
   SPI.setClockDivider(SPI_CLOCK_DIV2); // 8 MHz (6 MHz on Pro Trinket 3V)
 #else
-#ifdef ESP8266
+#if defined(ESP8266)
   SPI.setFrequency(8000000L);
 #elif defined(PIC32)
   // Use begin/end transaction to set SPI clock rate
@@ -217,7 +217,7 @@ void Adafruit_DotStar::hw_spi_init(void) { // Initialize hardware SPI
   @brief   Stop hardware SPI.
 */
 void Adafruit_DotStar::hw_spi_end(void) {
-#ifdef __AVR_ATtiny85__
+#if defined(__AVR_ATtiny85__)
   DDRB &= ~(_BV(PORTB1) | _BV(PORTB2)); // Inputs
 #elif (SPI_INTERFACES_COUNT > 0) || !defined(SPI_INTERFACES_COUNT)
   SPI.end();
@@ -231,7 +231,7 @@ void Adafruit_DotStar::hw_spi_end(void) {
 void Adafruit_DotStar::sw_spi_init(void) {
   pinMode(dataPin, OUTPUT);
   pinMode(clockPin, OUTPUT);
-#ifdef __AVR__
+#if defined(__AVR__)
   dataPort = portOutputRegister(digitalPinToPort(dataPin));
   clockPort = portOutputRegister(digitalPinToPort(clockPin));
   dataPinMask = digitalPinToBitMask(dataPin);
@@ -252,7 +252,7 @@ void Adafruit_DotStar::sw_spi_end() {
   pinMode(clockPin, INPUT);             // agrees with pinMap but can't be assumed (Portenta H7 comment).
 }
 
-#ifdef __AVR_ATtiny85__
+#if defined(__AVR_ATtiny85__)
 
 // Teensy/Gemma-specific stuff for hardware-half-assisted SPI
 
@@ -287,7 +287,7 @@ static void spi_out(uint8_t n) { // Clock out one byte
 */
 void Adafruit_DotStar::sw_spi_out(uint8_t n) {
   for (uint8_t i = 8; i--; n <<= 1) {
-#ifdef __AVR__
+#if defined(__AVR__)
     if (n & 0x80)
       *dataPort |= dataPinMask;
     else
@@ -341,7 +341,7 @@ void Adafruit_DotStar::show(void) {
 
     // TO DO: modernize this for SPI transactions
 
-#ifdef SPI_PIPELINE
+#if defined(SPI_PIPELINE)
     uint8_t next;
     for (i = 0; i < 3; i++)
       spi_out(0x00); // First 3 start-frame bytes
