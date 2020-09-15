@@ -200,8 +200,7 @@ void Adafruit_DotStar::hw_spi_init(void) { // Initialize hardware SPI
   // Use begin/end transaction to set SPI clock rate
   SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
   SPI.endTransaction();
-#else
-#if !defined(PORTENTA_H7)       
+#elif !defined(PORTENTA_H7)       
   SPI.setClockDivider((F_CPU + 4000000L) / 8000000L); // 8-ish MHz on Due
 #endif
 #endif
@@ -210,7 +209,6 @@ void Adafruit_DotStar::hw_spi_init(void) { // Initialize hardware SPI
   SPI.setBitOrder(MSBFIRST);
   SPI.setDataMode(SPI_MODE0);
 #endif  
-#endif
 }
 
 /*!
