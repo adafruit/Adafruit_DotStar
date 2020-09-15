@@ -28,7 +28,8 @@
 #include <pins_arduino.h>
 #endif
 
-#define PORTENTA_H7	// STM32H747xI
+// Uncomment the following to use the Portanta-H7 with the MKR-RGB Shield
+// #define PORTENTA_H7	// STM32H747xI
 
 // Color-order flag for LED pixels (optional extra parameter to constructor):
 // Bits 0,1 = R index (0-2), bits 2,3 = G index, bits 4,5 = B index
