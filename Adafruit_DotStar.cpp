@@ -246,8 +246,8 @@ void Adafruit_DotStar::sw_spi_init(void) {
   @brief   Stop 'soft' (bitbang) SPI. Data and clock pins are set to inputs.
 */
 void Adafruit_DotStar::sw_spi_end() {
-  pinMode(dataPin, INPUT);		// agrees with pinMap but can't be assumed.
-  pinMode(clockPin, INPUT);		// agrees with pinMap but can't be assumed.
+  pinMode(dataPin, INPUT);		// agrees with pinMap but can't be assumed (Portenta H7 comment).
+  pinMode(clockPin, INPUT);		// agrees with pinMap but can't be assumed (Portenta H7 comment).
 }
 
 #ifdef __AVR_ATtiny85__
