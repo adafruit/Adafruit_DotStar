@@ -92,7 +92,8 @@ Adafruit_DotStar::~Adafruit_DotStar(void) {
     hw_spi_end();
   else
 	  sw_spi_end();
-#else
+#endif  
+#ifdef PORTENTA_H7
    sw_spi_end();
 #endif
 }
@@ -107,7 +108,8 @@ void Adafruit_DotStar::begin(void) {
     hw_spi_init();
   else
 	  sw_spi_init();
-#else
+#endif
+#ifdef PORTENTA_H7	
 	sw_spi_init();
 #endif
 }
