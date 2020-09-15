@@ -247,7 +247,7 @@ void Adafruit_DotStar::sw_spi_init(void) {
 /*!
   @brief   Stop 'soft' (bitbang) SPI. Data and clock pins are set to inputs.
 */
-void Adafruit_DotStar::sw_spi_end() {
+void Adafruit_DotStar::sw_spi_end(void) {
 	pinMode(dataPin, INPUT);
 	// agrees with pinMap but can't be assumed (Portenta H7 comment).
 	pinMode(clockPin, INPUT);
@@ -415,7 +415,7 @@ void Adafruit_DotStar::show(void) {
 /*!
   @brief   Fill the whole DotStar strip with 0 / black / off.
 */
-void Adafruit_DotStar::clear() {
+void Adafruit_DotStar::clear(void) {
   memset(pixels, 0,
          (rOffset == gOffset) ? numLEDs + ((numLEDs + 3) / 4)
                               : // MONO: 10 bits/pixel
