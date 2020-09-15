@@ -653,9 +653,7 @@ uint32_t Adafruit_DotStar::gamma32(uint32_t x) {
 */
 void Adafruit_DotStar::sw_spi_end(void) {
 	pinMode(dataPin, INPUT);
-	// agrees with pinMap but can't be assumed (Portenta H7 comment).
 	pinMode(clockPin, INPUT);
-	// agrees with pinMap but can't be assumed (Portenta H7 comment).
 }
 
 
