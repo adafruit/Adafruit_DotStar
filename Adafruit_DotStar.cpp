@@ -91,7 +91,7 @@ Adafruit_DotStar::~Adafruit_DotStar(void) {
   if (dataPin == USE_HW_SPI)
     hw_spi_end();
   else
-	  sw_spi_end();
+          sw_spi_end();
 #endif  
 #ifdef PORTENTA_H7
    sw_spi_end();
@@ -103,14 +103,14 @@ Adafruit_DotStar::~Adafruit_DotStar(void) {
            to outputs and initializes hardware SPI if necessary.
 */
 void Adafruit_DotStar::begin(void) {
-#ifndef PORTENTA_H7	
+#ifndef PORTENTA_H7     
   if (dataPin == USE_HW_SPI)
     hw_spi_init();
   else
-	  sw_spi_init();
+          sw_spi_init();
 #endif
-#ifdef PORTENTA_H7	
-	sw_spi_init();
+#ifdef PORTENTA_H7      
+        sw_spi_init();
 #endif
 }
 
@@ -126,9 +126,9 @@ void Adafruit_DotStar::begin(void) {
            continue to be used.
 */
 void Adafruit_DotStar::updatePins(void) {
-	
+        
   sw_spi_end();
-#ifndef PORTENTA_H7		
+#ifndef PORTENTA_H7             
   dataPin = USE_HW_SPI;
   hw_spi_init();
 #endif
@@ -142,9 +142,9 @@ void Adafruit_DotStar::updatePins(void) {
   @param   clock  Arduino pin number for clock out.
 */
 void Adafruit_DotStar::updatePins(uint8_t data, uint8_t clock) {
-#ifndef PORTENTA_H7		
-	hw_spi_end();
-#endif	
+#ifndef PORTENTA_H7             
+        hw_spi_end();
+#endif  
   dataPin = data;
   clockPin = clock;
   sw_spi_init();
@@ -201,12 +201,12 @@ void Adafruit_DotStar::hw_spi_init(void) { // Initialize hardware SPI
   SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
   SPI.endTransaction();
 #else
-#ifndef PORTENTA_H7	  
+#ifndef PORTENTA_H7       
   SPI.setClockDivider((F_CPU + 4000000L) / 8000000L); // 8-ish MHz on Due
 #endif
 #endif
 #endif
-#ifndef PORTENTA_H7	  
+#ifndef PORTENTA_H7       
   SPI.setBitOrder(MSBFIRST);
   SPI.setDataMode(SPI_MODE0);
 #endif  
@@ -248,8 +248,8 @@ void Adafruit_DotStar::sw_spi_init(void) {
   @brief   Stop 'soft' (bitbang) SPI. Data and clock pins are set to inputs.
 */
 void Adafruit_DotStar::sw_spi_end() {
-  pinMode(dataPin, INPUT);		// agrees with pinMap but can't be assumed (Portenta H7 comment).
-  pinMode(clockPin, INPUT);		// agrees with pinMap but can't be assumed (Portenta H7 comment).
+  pinMode(dataPin, INPUT);              // agrees with pinMap but can't be assumed (Portenta H7 comment).
+  pinMode(clockPin, INPUT);             // agrees with pinMap but can't be assumed (Portenta H7 comment).
 }
 
 #ifdef __AVR_ATtiny85__
