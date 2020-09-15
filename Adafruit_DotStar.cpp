@@ -87,13 +87,13 @@ Adafruit_DotStar::Adafruit_DotStar(uint16_t n, uint8_t data, uint8_t clock,
 */
 Adafruit_DotStar::~Adafruit_DotStar(void) {
    free(pixels);
-#ifndef PORTENTA_H7
+#if !defined(PORTENTA_H7)
   if (dataPin == USE_HW_SPI)
     hw_spi_end();
   else
           sw_spi_end();
 #endif  
-#ifdef PORTENTA_H7
+#if defined(PORTENTA_H7)
    sw_spi_end();
 #endif
 }
@@ -103,13 +103,13 @@ Adafruit_DotStar::~Adafruit_DotStar(void) {
            to outputs and initializes hardware SPI if necessary.
 */
 void Adafruit_DotStar::begin(void) {
-#ifndef PORTENTA_H7     
+#if !defined(PORTENTA_H7)     
   if (dataPin == USE_HW_SPI)
     hw_spi_init();
   else
           sw_spi_init();
 #endif
-#ifdef PORTENTA_H7      
+#if defined(PORTENTA_H7)      
         sw_spi_init();
 #endif
 }
@@ -128,7 +128,7 @@ void Adafruit_DotStar::begin(void) {
 void Adafruit_DotStar::updatePins(void) {
         
   sw_spi_end();
-#ifndef PORTENTA_H7             
+#if !defined(PORTENTA_H7)             
   dataPin = USE_HW_SPI;
   hw_spi_init();
 #endif
@@ -142,7 +142,7 @@ void Adafruit_DotStar::updatePins(void) {
   @param   clock  Arduino pin number for clock out.
 */
 void Adafruit_DotStar::updatePins(uint8_t data, uint8_t clock) {
-#ifndef PORTENTA_H7             
+#if !defined(PORTENTA_H7)             
         hw_spi_end();
 #endif  
   dataPin = data;
@@ -201,12 +201,12 @@ void Adafruit_DotStar::hw_spi_init(void) { // Initialize hardware SPI
   SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
   SPI.endTransaction();
 #else
-#ifndef PORTENTA_H7       
+#if !defined(PORTENTA_H7)       
   SPI.setClockDivider((F_CPU + 4000000L) / 8000000L); // 8-ish MHz on Due
 #endif
 #endif
 #endif
-#ifndef PORTENTA_H7       
+#if !defined(PORTENTA_H7)       
   SPI.setBitOrder(MSBFIRST);
   SPI.setDataMode(SPI_MODE0);
 #endif  
