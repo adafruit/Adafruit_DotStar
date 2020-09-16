@@ -86,15 +86,15 @@ Adafruit_DotStar::Adafruit_DotStar(uint16_t n, uint8_t data, uint8_t clock,
            back to INPUT.
 */
 Adafruit_DotStar::~Adafruit_DotStar(void) {
-   free(pixels);
+  free(pixels);
 #if !defined(PORTENTA_H7)
   if (dataPin == USE_HW_SPI)
     hw_spi_end();
   else
-          sw_spi_end();
-#endif  
+    sw_spi_end();
+#endif
 #if defined(PORTENTA_H7)
-   sw_spi_end();
+  sw_spi_end();
 #endif
 }
 
@@ -103,14 +103,14 @@ Adafruit_DotStar::~Adafruit_DotStar(void) {
            to outputs and initializes hardware SPI if necessary.
 */
 void Adafruit_DotStar::begin(void) {
-#if !defined(PORTENTA_H7)     
+#if !defined(PORTENTA_H7)
   if (dataPin == USE_HW_SPI)
     hw_spi_init();
   else
-          sw_spi_init();
+    sw_spi_init();
 #endif
-#if defined(PORTENTA_H7)      
-        sw_spi_init();
+#if defined(PORTENTA_H7)
+  sw_spi_init();
 #endif
 }
 
@@ -126,9 +126,9 @@ void Adafruit_DotStar::begin(void) {
            continue to be used.
 */
 void Adafruit_DotStar::updatePins(void) {
-        
+
   sw_spi_end();
-#if !defined(PORTENTA_H7)             
+#if !defined(PORTENTA_H7)
   dataPin = USE_HW_SPI;
   hw_spi_init();
 #endif
@@ -142,9 +142,9 @@ void Adafruit_DotStar::updatePins(void) {
   @param   clock  Arduino pin number for clock out.
 */
 void Adafruit_DotStar::updatePins(uint8_t data, uint8_t clock) {
-#if !defined(PORTENTA_H7)             
-        hw_spi_end();
-#endif  
+#if !defined(PORTENTA_H7)
+  hw_spi_end();
+#endif
   dataPin = data;
   clockPin = clock;
   sw_spi_init();
@@ -201,16 +201,16 @@ void Adafruit_DotStar::hw_spi_init(void) { // Initialize hardware SPI
   SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
   SPI.endTransaction();
 #else
-#if !defined(PORTENTA_H7)       
+#if !defined(PORTENTA_H7)
   SPI.setClockDivider((F_CPU + 4000000L) / 8000000L); // 8-ish MHz on Due
 #endif
 #endif
-#endif  
-#if !defined(PORTENTA_H7)       
+#endif
+#if !defined(PORTENTA_H7)
   SPI.setBitOrder(MSBFIRST);
   SPI.setDataMode(SPI_MODE0);
 #endif
-#endif  
+#endif
 }
 
 /*!
@@ -244,16 +244,26 @@ void Adafruit_DotStar::sw_spi_init(void) {
 #endif
 }
 
+/*!
+  @brief   Stop 'soft' (bitbang) SPI. Data and clock pins are set to inputs.
+*/
+void Adafruit_DotStar::sw_spi_end(void) {
+  pinMode(dataPin, INPUT);  // pinPeripheral() should be called to make sure ok
+                            // in map file (H7)
+  pinMode(clockPin, INPUT); // pinPeripheral() should be called to make sure ok
+                            // in map file (H7)
+}
+
 #if defined(__AVR_ATtiny85__)
 // Teensy/Gemma-specific stuff for hardware-half-assisted SPI
-#define SPIBIT  \
-    USICR = ((1 << USIWM0) | (1 << USITC)); \
-    USICR =  \
-	((1 << USIWM0) | (1 << USITC) | (1 << USICLK)); // Clock bit tick, tock
+#define SPIBIT                                                                 \
+  USICR = ((1 << USIWM0) | (1 << USITC));                                      \
+  USICR =                                                                      \
+      ((1 << USIWM0) | (1 << USITC) | (1 << USICLK)); // Clock bit tick, tock
 
 static void spi_out(uint8_t n) { // Clock out one byte
-	USIDR = n;
-	SPIBIT SPIBIT SPIBIT SPIBIT SPIBIT SPIBIT SPIBIT SPIBIT
+  USIDR = n;
+  SPIBIT SPIBIT SPIBIT SPIBIT SPIBIT SPIBIT SPIBIT SPIBIT
 }
 
 #elif (SPI_INTERFACES_COUNT > 0) || !defined(SPI_INTERFACES_COUNT)
@@ -270,8 +280,6 @@ static void spi_out(uint8_t n) { // Clock out one byte
 #define spi_out(n) sw_spi_out(n)
 
 #endif
-
-
 
 /*!
   @brief   Soft (bitbang) SPI write.
@@ -647,13 +655,3 @@ uint32_t Adafruit_DotStar::gamma32(uint32_t x) {
     y[i] = gamma8(y[i]);
   return x; // Packed 32-bit return
 }
-
-/*!
-  @brief   Stop 'soft' (bitbang) SPI. Data and clock pins are set to inputs.
-*/
-void Adafruit_DotStar::sw_spi_end(void) {
-	pinMode(dataPin, INPUT);
-	pinMode(clockPin, INPUT);
-}
-
-
