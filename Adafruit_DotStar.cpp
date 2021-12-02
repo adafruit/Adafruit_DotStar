@@ -656,11 +656,13 @@ uint32_t Adafruit_DotStar::gamma32(uint32_t x) {
                        for better appearance.
 */
 void Adafruit_DotStar::rainbow(uint16_t first_hue, int8_t reps,
-  uint8_t saturation, uint8_t brightness, bool gammify) {
-  for (uint16_t i=0; i<numLEDs; i++) {
+                               uint8_t saturation, uint8_t brightness,
+                               bool gammify) {
+  for (uint16_t i = 0; i < numLEDs; i++) {
     uint16_t hue = first_hue + (i * reps * 65536) / numLEDs;
     uint32_t color = ColorHSV(hue, saturation, brightness);
-    if (gammify) color = gamma32(color);
+    if (gammify)
+      color = gamma32(color);
     setPixelColor(i, color);
   }
 }
