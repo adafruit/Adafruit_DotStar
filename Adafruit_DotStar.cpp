@@ -253,7 +253,9 @@ static void spi_out(uint8_t n) { // Clock out one byte
 
 #define spi_out(n) (void)SPI.transfer(n) ///< Call hardware SPI function
 // Pipelining reads next byte while current byte is clocked out
-#if (defined(__AVR__) && !defined(__AVR_ATtiny85__)) || defined(CORE_TEENSY)
+#if (defined(__AVR__) &&                                                       \
+     !(defined(__AVR_ATtiny85__) || defined(ARDUINO_ARCH_MEGAAVR))) ||         \
+    defined(CORE_TEENSY)
 #define SPI_PIPELINE
 #endif
 
