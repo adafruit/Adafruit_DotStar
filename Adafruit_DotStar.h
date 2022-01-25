@@ -21,12 +21,9 @@
 #ifndef _ADAFRUIT_DOT_STAR_H_
 #define _ADAFRUIT_DOT_STAR_H_
 
-#if (ARDUINO >= 100)
-#include <Arduino.h>
-#else
-#include <WProgram.h>
-#include <pins_arduino.h>
-#endif
+#include "Arduino.h"
+
+#include <Adafruit_SPIDevice.h>
 
 // Color-order flag for LED pixels (optional extra parameter to constructor):
 // Bits 0,1 = R index (0-2), bits 2,3 = G index, bits 4,5 = B index
@@ -191,25 +188,13 @@ public:
                boolean gammify = true);
 
 private:
-  uint16_t numLEDs;   ///< Number of pixels
-  uint8_t dataPin;    ///< If soft SPI, data pin #
-  uint8_t clockPin;   ///< If soft SPI, clock pin #
-  uint8_t brightness; ///< Global brightness setting
-  uint8_t *pixels;    ///< LED RGB values (3 bytes ea.)
-  uint8_t rOffset;    ///< Index of red in 3-byte pixel
-  uint8_t gOffset;    ///< Index of green byte
-  uint8_t bOffset;    ///< Index of blue byte
-#ifdef __AVR__
-  uint8_t dataPinMask;         ///< If soft SPI, data pin bitmask
-  uint8_t clockPinMask;        ///< If soft SPI, clock pin bitmask
-  volatile uint8_t *dataPort;  ///< If soft SPI, data PORT
-  volatile uint8_t *clockPort; ///< If soft SPI, clock PORT
-#endif
-  void hw_spi_init(void);     ///< Start hardware SPI
-  void hw_spi_end(void);      ///< Stop hardware SPI
-  void sw_spi_init(void);     ///< Start bitbang SPI
-  void sw_spi_out(uint8_t n); ///< Bitbang SPI write
-  void sw_spi_end(void);      ///< Stop bitbang SPI
+  Adafruit_SPIDevice *spi_dev = NULL; ///< Pointer to SPI bus interface
+  uint16_t numLEDs;                   ///< Number of pixels
+  uint8_t brightness;                 ///< Global brightness setting
+  uint8_t *pixels;                    ///< LED RGB values (3 bytes ea.)
+  uint8_t rOffset;                    ///< Index of red in 3-byte pixel
+  uint8_t gOffset;                    ///< Index of green byte
+  uint8_t bOffset;                    ///< Index of blue byte
 };
 
 #endif // _ADAFRUIT_DOT_STAR_H_
