@@ -40,11 +40,6 @@
  */
 
 #include "Adafruit_DotStar.h"
-#if !defined(__AVR_ATtiny85__)
-#include <SPI.h>
-#endif
-
-#define USE_HW_SPI 255 ///< Assigned to dataPin to indicate 'hard' SPI
 
 /*!
   @brief   DotStar constructor for hardware SPI. Must be connected to
@@ -57,8 +52,9 @@
   @return  Adafruit_DotStar object. Call the begin() function before use.
 */
 Adafruit_DotStar::Adafruit_DotStar(uint16_t n, uint8_t o)
-    : numLEDs(n), dataPin(USE_HW_SPI), brightness(0), pixels(NULL),
-      rOffset(o & 3), gOffset((o >> 2) & 3), bOffset((o >> 4) & 3) {
+    : numLEDs(n), brightness(0), pixels(NULL), rOffset(o & 3),
+      gOffset((o >> 2) & 3), bOffset((o >> 4) & 3) {
+  spi_dev = new Adafruit_SPIDevice(-1, 8000000);
   updateLength(n);
 }
 
@@ -76,8 +72,9 @@ Adafruit_DotStar::Adafruit_DotStar(uint16_t n, uint8_t o)
 */
 Adafruit_DotStar::Adafruit_DotStar(uint16_t n, uint8_t data, uint8_t clock,
                                    uint8_t o)
-    : dataPin(data), clockPin(clock), brightness(0), pixels(NULL),
-      rOffset(o & 3), gOffset((o >> 2) & 3), bOffset((o >> 4) & 3) {
+    : brightness(0), pixels(NULL), rOffset(o & 3), gOffset((o >> 2) & 3),
+      bOffset((o >> 4) & 3) {
+  spi_dev = new Adafruit_SPIDevice(-1, clock, -1, data, 8000000);
   updateLength(n);
 }
 
@@ -87,22 +84,15 @@ Adafruit_DotStar::Adafruit_DotStar(uint16_t n, uint8_t data, uint8_t clock,
 */
 Adafruit_DotStar::~Adafruit_DotStar(void) {
   free(pixels);
-  if (dataPin == USE_HW_SPI)
-    hw_spi_end();
-  else
-    sw_spi_end();
+  if (spi_dev)
+    delete (spi_dev);
 }
 
 /*!
   @brief   Initialize Adafruit_DotStar object -- sets data and clock pins
            to outputs and initializes hardware SPI if necessary.
 */
-void Adafruit_DotStar::begin(void) {
-  if (dataPin == USE_HW_SPI)
-    hw_spi_init();
-  else
-    sw_spi_init();
-}
+void Adafruit_DotStar::begin(void) { spi_dev->begin(); }
 
 // Pins may be reassigned post-begin(), so a sketch can store hardware
 // config in flash, SD card, etc. rather than hardcoded. Also permits
@@ -116,9 +106,10 @@ void Adafruit_DotStar::begin(void) {
            continue to be used.
 */
 void Adafruit_DotStar::updatePins(void) {
-  sw_spi_end();
-  dataPin = USE_HW_SPI;
-  hw_spi_init();
+  if (spi_dev)
+    delete (spi_dev);
+  spi_dev = new Adafruit_SPIDevice(-1, 8000000);
+  spi_dev->begin();
 }
 
 /*!
@@ -129,10 +120,10 @@ void Adafruit_DotStar::updatePins(void) {
   @param   clock  Arduino pin number for clock out.
 */
 void Adafruit_DotStar::updatePins(uint8_t data, uint8_t clock) {
-  hw_spi_end();
-  dataPin = data;
-  clockPin = clock;
-  sw_spi_init();
+  if (spi_dev)
+    delete (spi_dev);
+  spi_dev = new Adafruit_SPIDevice(-1, clock, -1, data, 8000000);
+  spi_dev->begin();
 }
 
 /*!
@@ -160,138 +151,6 @@ void Adafruit_DotStar::updateLength(uint16_t n) {
 
 // SPI STUFF ---------------------------------------------------------------
 
-/*!
-  @brief   Initialize hardware SPI.
-  @note    This library is written in pre-SPI-transactions style and needs
-           some rewriting to correctly share the SPI bus with other devices.
-*/
-void Adafruit_DotStar::hw_spi_init(void) { // Initialize hardware SPI
-#ifdef __AVR_ATtiny85__
-  PORTB &= ~(_BV(PORTB1) | _BV(PORTB2)); // Outputs
-  DDRB |= _BV(PORTB1) | _BV(PORTB2);     // DO (NOT MOSI) + SCK
-#elif (SPI_INTERFACES_COUNT > 0) || !defined(SPI_INTERFACES_COUNT)
-  SPI.begin();
-  // Hardware SPI clock speeds are chosen to run at roughly 1-8 MHz for most
-  // boards, providing a slower but more reliable experience by default.  If
-  // you want faster LED updates, experiment with the clock speeds to find
-  // what works best with your particular setup.
-#if defined(__AVR__) || defined(CORE_TEENSY) || defined(__ARDUINO_ARC__) ||    \
-    defined(__ARDUINO_X86__)
-  SPI.setClockDivider(SPI_CLOCK_DIV2); // 8 MHz (6 MHz on Pro Trinket 3V)
-#else
-#ifdef ESP8266
-  SPI.setFrequency(8000000L);
-#elif defined(PIC32)
-  // Use begin/end transaction to set SPI clock rate
-  SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
-  SPI.endTransaction();
-#else
-  SPI.setClockDivider((F_CPU + 4000000L) / 8000000L); // 8-ish MHz on Due
-#endif
-#endif
-  SPI.setBitOrder(MSBFIRST);
-  SPI.setDataMode(SPI_MODE0);
-#endif
-}
-
-/*!
-  @brief   Stop hardware SPI.
-*/
-void Adafruit_DotStar::hw_spi_end(void) {
-#ifdef __AVR_ATtiny85__
-  DDRB &= ~(_BV(PORTB1) | _BV(PORTB2)); // Inputs
-#elif (SPI_INTERFACES_COUNT > 0) || !defined(SPI_INTERFACES_COUNT)
-  SPI.end();
-#endif
-}
-
-/*!
-  @brief   Initialize 'soft' (bitbang) SPI. Data and clock pins are set
-           to outputs.
-*/
-void Adafruit_DotStar::sw_spi_init(void) {
-  pinMode(dataPin, OUTPUT);
-  pinMode(clockPin, OUTPUT);
-#ifdef __AVR__
-  dataPort = portOutputRegister(digitalPinToPort(dataPin));
-  clockPort = portOutputRegister(digitalPinToPort(clockPin));
-  dataPinMask = digitalPinToBitMask(dataPin);
-  clockPinMask = digitalPinToBitMask(clockPin);
-  *dataPort &= ~dataPinMask;
-  *clockPort &= ~clockPinMask;
-#else
-  digitalWrite(dataPin, LOW);
-  digitalWrite(clockPin, LOW);
-#endif
-}
-
-/*!
-  @brief   Stop 'soft' (bitbang) SPI. Data and clock pins are set to inputs.
-*/
-void Adafruit_DotStar::sw_spi_end() {
-  pinMode(dataPin, INPUT);
-  pinMode(clockPin, INPUT);
-}
-
-#ifdef __AVR_ATtiny85__
-
-// Teensy/Gemma-specific stuff for hardware-half-assisted SPI
-
-#define SPIBIT                                                                 \
-  USICR = ((1 << USIWM0) | (1 << USITC));                                      \
-  USICR =                                                                      \
-      ((1 << USIWM0) | (1 << USITC) | (1 << USICLK)); // Clock bit tick, tock
-
-static void spi_out(uint8_t n) { // Clock out one byte
-  USIDR = n;
-  SPIBIT SPIBIT SPIBIT SPIBIT SPIBIT SPIBIT SPIBIT SPIBIT
-}
-
-#elif (SPI_INTERFACES_COUNT > 0) || !defined(SPI_INTERFACES_COUNT)
-
-// All other boards have full-featured hardware support for SPI
-
-#define spi_out(n) (void)SPI.transfer(n) ///< Call hardware SPI function
-// Pipelining reads next byte while current byte is clocked out
-#if (defined(__AVR__) && !defined(__AVR_ATtiny85__)) || defined(CORE_TEENSY)
-#define SPI_PIPELINE
-#endif
-
-#else // no hardware spi
-#define spi_out(n) sw_spi_out(n)
-
-#endif
-
-/*!
-  @brief   Soft (bitbang) SPI write.
-  @param   n  8-bit value to transfer.
-*/
-void Adafruit_DotStar::sw_spi_out(uint8_t n) {
-  for (uint8_t i = 8; i--; n <<= 1) {
-#ifdef __AVR__
-    if (n & 0x80)
-      *dataPort |= dataPinMask;
-    else
-      *dataPort &= ~dataPinMask;
-    *clockPort |= clockPinMask;
-    *clockPort &= ~clockPinMask;
-#else
-    if (n & 0x80)
-      digitalWrite(dataPin, HIGH);
-    else
-      digitalWrite(dataPin, LOW);
-    digitalWrite(clockPin, HIGH);
-#if F_CPU >= 48000000
-    __asm__ volatile("nop \n nop");
-#endif
-    digitalWrite(clockPin, LOW);
-#if F_CPU >= 48000000
-    __asm__ volatile("nop \n nop");
-#endif
-#endif
-  }
-}
-
 /* ISSUE DATA TO LED STRIP -------------------------------------------------
 
   Although the LED driver has an additional per-pixel 5-bit brightness
@@ -310,7 +169,6 @@ void Adafruit_DotStar::sw_spi_out(uint8_t n) {
   @brief   Transmit pixel data in RAM to DotStars.
 */
 void Adafruit_DotStar::show(void) {
-
   if (!pixels)
     return;
 
@@ -318,77 +176,37 @@ void Adafruit_DotStar::show(void) {
   uint16_t n = numLEDs;                // Counter
   uint16_t b16 = (uint16_t)brightness; // Type-convert for fixed-point math
 
-  if (dataPin == USE_HW_SPI) {
+  // [START FRAME]
+  for (i = 0; i < 4; i++)
+    spi_dev->transfer(0x00);
 
-    // TO DO: modernize this for SPI transactions
-
-#ifdef SPI_PIPELINE
-    uint8_t next;
-    for (i = 0; i < 3; i++)
-      spi_out(0x00); // First 3 start-frame bytes
-    SPDR = 0x00;     // 4th is pipelined
-    do {             // For each pixel...
-      while (!(SPSR & _BV(SPIF)))
-        ;                       //  Wait for prior byte out
-      SPDR = 0xFF;              //  Pixel start
-      for (i = 0; i < 3; i++) { //  For R,G,B...
-        next = brightness ? (*ptr++ * b16) >> 8 : *ptr++; // Read, scale
-        while (!(SPSR & _BV(SPIF)))
-          ;          //   Wait for prior byte out
-        SPDR = next; //   Write scaled color
-      }
+  // [PIXEL DATA]
+  if (brightness) {            // Scale pixel brightness on output
+    do {                       // For each pixel...
+      spi_dev->transfer(0xFF); //  Pixel start
+      for (i = 0; i < 3; i++)
+        spi_dev->transfer((*ptr++ * b16) >> 8); // Scale, write
     } while (--n);
-    while (!(SPSR & _BV(SPIF)))
-      ; // Wait for last byte out
-#else
-    for (i = 0; i < 4; i++)
-      spi_out(0x00);   // 4 byte start-frame marker
-    if (brightness) {  // Scale pixel brightness on output
-      do {             // For each pixel...
-        spi_out(0xFF); //  Pixel start
-        for (i = 0; i < 3; i++)
-          spi_out((*ptr++ * b16) >> 8); // Scale, write RGB
-      } while (--n);
-    } else {           // Full brightness (no scaling)
-      do {             // For each pixel...
-        spi_out(0xFF); //  Pixel start
-        for (i = 0; i < 3; i++)
-          spi_out(*ptr++); // Write R,G,B
-      } while (--n);
-    }
-#endif
-    // Four end-frame bytes are seemingly indistinguishable from a white
-    // pixel, and empirical testing suggests it can be left out...but it's
-    // always a good idea to follow the datasheet, in case future hardware
-    // revisions are more strict (e.g. might mandate use of end-frame
-    // before start-frame marker). i.e. let's not remove this. But after
-    // testing a bit more the suggestion is to use at least (numLeds+1)/2
-    // high values (1) or (numLeds+15)/16 full bytes as EndFrame. For details
-    // see also:
-    // https://cpldcpu.wordpress.com/2014/11/30/understanding-the-apa102-superled/
-    for (i = 0; i < ((numLEDs + 15) / 16); i++)
-      spi_out(0xFF);
-
-  } else { // Soft (bitbang) SPI
-
-    for (i = 0; i < 4; i++)
-      sw_spi_out(0);      // Start-frame marker
-    if (brightness) {     // Scale pixel brightness on output
-      do {                // For each pixel...
-        sw_spi_out(0xFF); //  Pixel start
-        for (i = 0; i < 3; i++)
-          sw_spi_out((*ptr++ * b16) >> 8); // Scale, write
-      } while (--n);
-    } else {              // Full brightness (no scaling)
-      do {                // For each pixel...
-        sw_spi_out(0xFF); //  Pixel start
-        for (i = 0; i < 3; i++)
-          sw_spi_out(*ptr++); // R,G,B
-      } while (--n);
-    }
-    for (i = 0; i < ((numLEDs + 15) / 16); i++)
-      sw_spi_out(0xFF); // End-frame marker (see note above)
+  } else {                     // Full brightness (no scaling)
+    do {                       // For each pixel...
+      spi_dev->transfer(0xFF); //  Pixel start
+      for (i = 0; i < 3; i++)
+        spi_dev->transfer(*ptr++); // R,G,B
+    } while (--n);
   }
+
+  // [END FRAME]
+  // Four end-frame bytes are seemingly indistinguishable from a white
+  // pixel, and empirical testing suggests it can be left out...but it's
+  // always a good idea to follow the datasheet, in case future hardware
+  // revisions are more strict (e.g. might mandate use of end-frame
+  // before start-frame marker). i.e. let's not remove this. But after
+  // testing a bit more the suggestion is to use at least (numLeds+1)/2
+  // high values (1) or (numLeds+15)/16 full bytes as EndFrame. For details
+  // see also:
+  // https://cpldcpu.wordpress.com/2014/11/30/understanding-the-apa102-superled/
+  for (i = 0; i < ((numLEDs + 15) / 16); i++)
+    spi_dev->transfer(0xFF);
 }
 
 /*!
