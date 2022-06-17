@@ -176,6 +176,9 @@ void Adafruit_DotStar::show(void) {
   uint16_t n = numLEDs;                // Counter
   uint16_t b16 = (uint16_t)brightness; // Type-convert for fixed-point math
 
+  // Begin transaction, setting SPI frequency
+  spi_dev->beginTransaction();
+
   // [START FRAME]
   for (i = 0; i < 4; i++)
     spi_dev->transfer(0x00);
@@ -207,6 +210,9 @@ void Adafruit_DotStar::show(void) {
   // https://cpldcpu.wordpress.com/2014/11/30/understanding-the-apa102-superled/
   for (i = 0; i < ((numLEDs + 15) / 16); i++)
     spi_dev->transfer(0xFF);
+
+  // Finish SPI transaction
+  spi_dev->endTransaction();
 }
 
 /*!
