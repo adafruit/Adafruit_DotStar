@@ -74,9 +74,9 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a0634d5672982360e89a9a4699bc42adc"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___dot_star.html#a0634d5672982360e89a9a4699bc42adc">Adafruit_DotStar</a> (uint16_t n, uint8_t o=<a class="el" href="_adafruit___dot_star_8h.html#af72fd637bb36fc64200def59cfff5e8f">DOTSTAR_BRG</a>)</td></tr>
-<tr class="memdesc:a0634d5672982360e89a9a4699bc42adc"><td class="mdescLeft">&#160;</td><td class="mdescRight">DotStar constructor for hardware SPI. Must be connected to MOSI, SCK pins.  <a href="#a0634d5672982360e89a9a4699bc42adc">More...</a><br /></td></tr>
-<tr class="separator:a0634d5672982360e89a9a4699bc42adc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a23a2fff3ccbd84ef48348c713bcf63e0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___dot_star.html#a23a2fff3ccbd84ef48348c713bcf63e0">Adafruit_DotStar</a> (uint16_t n, uint8_t o=<a class="el" href="_adafruit___dot_star_8h.html#af72fd637bb36fc64200def59cfff5e8f">DOTSTAR_BRG</a>, SPIClass *spi=NULL)</td></tr>
+<tr class="memdesc:a23a2fff3ccbd84ef48348c713bcf63e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">DotStar constructor for hardware SPI. Must be connected to MOSI, SCK pins.  <a href="#a23a2fff3ccbd84ef48348c713bcf63e0">More...</a><br /></td></tr>
+<tr class="separator:a23a2fff3ccbd84ef48348c713bcf63e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2fce3fd6bfe6e5caaa7a1308197d638b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___dot_star.html#a2fce3fd6bfe6e5caaa7a1308197d638b">Adafruit_DotStar</a> (uint16_t n, uint8_t d, uint8_t c, uint8_t o=<a class="el" href="_adafruit___dot_star_8h.html#af72fd637bb36fc64200def59cfff5e8f">DOTSTAR_BRG</a>)</td></tr>
 <tr class="memdesc:a2fce3fd6bfe6e5caaa7a1308197d638b"><td class="mdescLeft">&#160;</td><td class="mdescRight">DotStar constructor for 'soft' (bitbang) SPI. Any two pins can be used.  <a href="#a2fce3fd6bfe6e5caaa7a1308197d638b">More...</a><br /></td></tr>
 <tr class="separator:a2fce3fd6bfe6e5caaa7a1308197d638b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -155,8 +155,8 @@ Static Public Member Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Class that stores state and functions for interacting with Adafruit DotStars and compatible devices. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a0634d5672982360e89a9a4699bc42adc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0634d5672982360e89a9a4699bc42adc">&#9670;&nbsp;</a></span>Adafruit_DotStar() <span class="overload">[1/2]</span></h2>
+<a id="a23a2fff3ccbd84ef48348c713bcf63e0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a23a2fff3ccbd84ef48348c713bcf63e0">&#9670;&nbsp;</a></span>Adafruit_DotStar() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -171,7 +171,13 @@ Static Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">uint8_t&#160;</td>
-          <td class="paramname"><em>o</em> = <code><a class="el" href="_adafruit___dot_star_8h.html#af72fd637bb36fc64200def59cfff5e8f">DOTSTAR_BRG</a></code>&#160;</td>
+          <td class="paramname"><em>o</em> = <code><a class="el" href="_adafruit___dot_star_8h.html#af72fd637bb36fc64200def59cfff5e8f">DOTSTAR_BRG</a></code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">SPIClass *&#160;</td>
+          <td class="paramname"><em>spi</em> = <code>NULL</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -186,6 +192,7 @@ Static Public Member Functions</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">n</td><td>Number of DotStars in strand. </td></tr>
     <tr><td class="paramname">o</td><td>Pixel type &ndash; one of the DOTSTAR_* constants defined in <a class="el" href="_adafruit___dot_star_8h.html">Adafruit_DotStar.h</a>, for example DOTSTAR_BRG for DotStars expecting color bytes expressed in blue, red, green order per pixel. Default if unspecified is DOTSTAR_BRG. </td></tr>
+    <tr><td class="paramname">spi</td><td>Pointer to hardware SPIClass object (default is primary SPI device 'SPI' if defined, else MUST pass in device). </td></tr>
   </table>
   </dd>
 </dl>
