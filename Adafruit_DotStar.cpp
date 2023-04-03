@@ -44,17 +44,20 @@
 /*!
   @brief   DotStar constructor for hardware SPI. Must be connected to
            MOSI, SCK pins.
-  @param   n  Number of DotStars in strand.
-  @param   o  Pixel type -- one of the DOTSTAR_* constants defined in
-              Adafruit_DotStar.h, for example DOTSTAR_BRG for DotStars
-              expecting color bytes expressed in blue, red, green order
-              per pixel. Default if unspecified is DOTSTAR_BRG.
+  @param   n    Number of DotStars in strand.
+  @param   o    Pixel type -- one of the DOTSTAR_* constants defined in
+                Adafruit_DotStar.h, for example DOTSTAR_BRG for DotStars
+                expecting color bytes expressed in blue, red, green order
+                per pixel. Default if unspecified is DOTSTAR_BRG.
+  @param   spi  Pointer to hardware SPIClass object (default is primary
+                SPI device 'SPI' if defined, else MUST pass in device).
   @return  Adafruit_DotStar object. Call the begin() function before use.
 */
-Adafruit_DotStar::Adafruit_DotStar(uint16_t n, uint8_t o)
+Adafruit_DotStar::Adafruit_DotStar(uint16_t n, uint8_t o, SPIClass *spi)
     : numLEDs(n), brightness(0), pixels(NULL), rOffset(o & 3),
       gOffset((o >> 2) & 3), bOffset((o >> 4) & 3) {
-  spi_dev = new Adafruit_SPIDevice(-1, 8000000);
+  spi_dev = new Adafruit_SPIDevice(-1, 8000000, SPI_BITORDER_MSBFIRST,
+                                   SPI_MODE0, spi);
   updateLength(n);
 }
 

@@ -101,7 +101,11 @@ static const uint8_t PROGMEM _DotStarGammaTable[256] = {
 class Adafruit_DotStar {
 
 public:
-  Adafruit_DotStar(uint16_t n, uint8_t o = DOTSTAR_BRG);
+#if defined SPI // Is a default hardware SPI device defined for this board?
+  Adafruit_DotStar(uint16_t n, uint8_t o = DOTSTAR_BRG, SPIClass *spi = &SPI);
+#else
+  Adafruit_DotStar(uint16_t n, uint8_t o = DOTSTAR_BRG, SPIClass *spi = NULL);
+#endif
   Adafruit_DotStar(uint16_t n, uint8_t d, uint8_t c, uint8_t o = DOTSTAR_BRG);
   ~Adafruit_DotStar(void);
 
