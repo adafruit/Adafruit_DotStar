@@ -1,16 +1,20 @@
-// An example demonstrating how to control the Adafruit Dot Star RGB LED
-// included on board the ItsyBitsy M4 board.
+// An example demonstrating how to control the onboard DotStar RGB LED
+// Works for the following boards:
+//   Adafruit ItsyBitsy M0 Express
+//   Adafruit ItsyBitsy M4
+//   Adafruit ItsyBitsy nRF52840
+//   Adafruit Trinket M0
+//   Adafruit PyRuler
+//   Adafruit FunHouse
+//   Adafruit GEMMA M0
 
 #include <Adafruit_DotStar.h>
 
-// There is only one pixel on the board
-#define NUMPIXELS 1 
-
-//Use these pin definitions for the ItsyBitsy M4
-#define DATAPIN    8
-#define CLOCKPIN   6
-
-Adafruit_DotStar strip(NUMPIXELS, DATAPIN, CLOCKPIN, DOTSTAR_BRG);
+// Everything is defined in the Board Support Package
+// DOTSTAR_NUM        number of onboard DotStars (typically just 1)
+// PIN_DOTSTAR_DATA   onboard DotStar data pin
+// PIN_DOTSTAR_CLK    onboard DotStar clock pin
+Adafruit_DotStar strip(DOTSTAR_NUM, PIN_DOTSTAR_DATA, PIN_DOTSTAR_CLK, DOTSTAR_BRG);
 
 void setup() {
   strip.begin(); // Initialize pins for output
@@ -21,7 +25,6 @@ void setup() {
 void loop() {
   rainbow(10);             // Flowing rainbow cycle along the whole strip
 }
-
 
 
 // Rainbow cycle along whole strip. Pass delay time (in ms) between frames.
