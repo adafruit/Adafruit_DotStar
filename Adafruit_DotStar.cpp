@@ -40,6 +40,7 @@
  */
 
 #include "Adafruit_DotStar.h"
+#include "adafruit_five_bit_hd_gamma.h"
 
 /*!
   @brief   DotStar constructor for hardware SPI. Must be connected to
@@ -186,19 +187,33 @@ void Adafruit_DotStar::show(void) {
   for (i = 0; i < 4; i++)
     spi_dev->transfer(0x00);
 
-  // [PIXEL DATA]
-  if (brightness) {            // Scale pixel brightness on output
-    do {                       // For each pixel...
-      spi_dev->transfer(0xFF); //  Pixel start
+  if (hdGammaMode) {
+    uint8_t r, g, b, v;
+    do {                // For each pixel...
+      r = ptr[rOffset]; //  Read R,G,B
+      g = ptr[gOffset];
+      b = ptr[bOffset];
+      five_bit_hd_gamma_bitshift(r, g, b, &r, &g, &b, &v);
+      v |= 0b11100000;      // Top 3 MSB should all be 1.
+      spi_dev->transfer(v); // Send brightness component.
       for (i = 0; i < 3; i++)
-        spi_dev->transfer((*ptr++ * b16) >> 8); // Scale, write
+        spi_dev->transfer(*ptr++); // Scale, write
     } while (--n);
-  } else {                     // Full brightness (no scaling)
-    do {                       // For each pixel...
-      spi_dev->transfer(0xFF); //  Pixel start
-      for (i = 0; i < 3; i++)
-        spi_dev->transfer(*ptr++); // R,G,B
-    } while (--n);
+  } else {
+    // [PIXEL DATA]
+    if (brightness) {            // Scale pixel brightness on output
+      do {                       // For each pixel...
+        spi_dev->transfer(0xFF); //  Pixel start
+        for (i = 0; i < 3; i++)
+          spi_dev->transfer((*ptr++ * b16) >> 8); // Scale, write
+      } while (--n);
+    } else {                     // Full brightness (no scaling)
+      do {                       // For each pixel...
+        spi_dev->transfer(0xFF); //  Pixel start
+        for (i = 0; i < 3; i++)
+          spi_dev->transfer(*ptr++); // R,G,B
+      } while (--n);
+    }
   }
 
   // [END FRAME]
@@ -431,6 +446,12 @@ void Adafruit_DotStar::setBrightness(uint8_t b) {
 }
 
 /*!
+  @brief   Enables the HD gamma mode.
+  @param   on  enables or disables the HD gamma mode.
+*/
+void Adafruit_DotStar::setHDGammaMode(bool on) { hdGammaMode = on; }
+
+/*!
   @brief   Retrieve the last-set brightness value for the strip.
   @return  Brightness value: 0 = minimum (off), 255 = maximum.
 */
@@ -480,7 +501,9 @@ uint32_t Adafruit_DotStar::gamma32(uint32_t x) {
                        default = 255. This is distinct and in combination
                        with any configured global strip brightness.
   @param   gammify     If true (default), apply gamma correction to colors
-                       for better appearance.
+                       for better appearance. If hdGammaMode is enabled then
+                       gammify is ignored as values will always be gamma
+                       corrected at the driver level.
 */
 void Adafruit_DotStar::rainbow(uint16_t first_hue, int8_t reps,
                                uint8_t saturation, uint8_t brightness,
@@ -488,7 +511,7 @@ void Adafruit_DotStar::rainbow(uint16_t first_hue, int8_t reps,
   for (uint16_t i = 0; i < numLEDs; i++) {
     uint16_t hue = first_hue + (i * reps * 65536) / numLEDs;
     uint32_t color = ColorHSV(hue, saturation, brightness);
-    if (gammify)
+    if (gammify && !hdGammaMode)
       color = gamma32(color);
     setPixelColor(i, color);
   }
