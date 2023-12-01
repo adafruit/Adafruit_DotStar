@@ -117,10 +117,15 @@ public:
   void setPixelColor(uint16_t n, uint8_t r, uint8_t g, uint8_t b);
   void fill(uint32_t c = 0, uint16_t first = 0, uint16_t count = 0);
   void setBrightness(uint8_t);
+  // When enabled, a special APA102 gamma correction algorithm will be employed
+  // which utilizing the APA102's 5-bit brightness control value. This
+  // effectively grants an additional 5 bits of brightness.
+  void setHDGammaMode(bool);
   void clear();
   void updateLength(uint16_t n);
   void updatePins(void);
   void updatePins(uint8_t d, uint8_t c);
+
   /*!
     @brief   Get a pointer directly to the DotStar data buffer in RAM.
              Pixel data is stored in a device-native format (a la the
@@ -201,6 +206,7 @@ private:
   uint8_t rOffset;                    ///< Index of red in 3-byte pixel
   uint8_t gOffset;                    ///< Index of green byte
   uint8_t bOffset;                    ///< Index of blue byte
+  bool hdGammaMode = false;           ///< HD gamma correction mode flag
 };
 
 #endif // _ADAFRUIT_DOT_STAR_H_
